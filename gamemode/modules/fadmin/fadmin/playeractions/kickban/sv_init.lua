@@ -37,8 +37,7 @@ local function Kick(ply, cmd, args)
                 Reason = Reason and string.gsub(Reason, ";", " ") or "No reason provided"
 
                 hook.Call("FAdmin_Kick", nil, ply, target, Reason)
-                game.ConsoleCommand(string.format("kickid %s %s\n", target:UserID(), "Kicked by " .. name ..
-                    " (" .. Reason .. ")"))
+                game.KickID(target:UserID(), "Kicked by " .. name .. " (" .. Reason .. ")")
                 ply.FAdminKickReason = nil
             end
         end
@@ -59,7 +58,7 @@ hook.Add("PlayerAuthed", "FAdmin_LeavingBeforeBan", function(ply, SteamID, ...)
         return
     end
 
-    game.ConsoleCommand(string.format("kickid %s %s\n", ply:UserID(), "Getting banned"))
+    game.KickID(ply:UserID(), "Getting banned")
 end)
 
 -- Banning
@@ -239,7 +238,7 @@ local function UnBan(ply, cmd, args)
 
     StartBannedUsers[steamID] = nil
 
-    game.ConsoleCommand("removeid " .. steamID .. "\n")
+    RunConsoleCommand("removeid", steamID)
     FAdmin.Messages.FireNotification("unban", ply, nil, {nick, steamID})
 
     return true, steamID

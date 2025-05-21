@@ -1068,16 +1068,16 @@ function GM:InitPostEntity()
 
     -- Scriptenforcer enabled by default? Fuck you, not gonna happen.
     if not GAMEMODE.Config.disallowClientsideScripts then
-        game.ConsoleCommand("sv_allowcslua 1\n")
+        RunConsoleCommand("sv_allowcslua", "1")
         timer.Simple(1, fuckQAC) -- Also, fuck QAC which bans innocent people when allowcslua = 1
     end
-    game.ConsoleCommand("physgun_DampingFactor 0.9\n")
-    game.ConsoleCommand("sv_sticktoground 0\n")
-    game.ConsoleCommand("sv_airaccelerate 1000\n")
+    RunConsoleCommand("physgun_DampingFactor", "0.9")
+    RunConsoleCommand("sv_sticktoground", "0")
+    RunConsoleCommand("sv_airaccelerate", "1000")
     -- sv_alltalk must be 0
     -- Note, everyone will STILL hear everyone UNLESS GM.Config.voiceradius is set to true
     -- This will fix the GM.Config.voiceradius not working
-    game.ConsoleCommand("sv_alltalk 0\n")
+    RunConsoleCommand("sv_alltalk", "0")
 
     if GAMEMODE.Config.unlockdoorsonstart then
         for _, v in ipairs(ents.GetAll()) do

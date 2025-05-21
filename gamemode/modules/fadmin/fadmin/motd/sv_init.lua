@@ -25,7 +25,7 @@ hook.Add("InitPostEntity", "PlaceMOTD", function()
 
     local motdPage = file.Read("FAdmin/CurMOTDPage.txt", "DATA")
     if motdPage and motdPage ~= "" then
-        game.ConsoleCommand("_FAdmin_MOTDPage \"" .. motdPage .. "\"\n")
+        RunConsoleCommand("_FAdmin_MOTDPage", "motdPage")
     end
 end)
 
