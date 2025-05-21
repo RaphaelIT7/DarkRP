@@ -2,14 +2,16 @@ local function IncludeFolder(fol)
     fol = string.lower(fol)
     local _, folders = file.Find(fol .. "*", "LUA")
 
-    for _, folder in SortedPairs(folders, true) do
+    --[[
+        Previously used SortedPairs but it never had any effect since file.Find returned sequential tables so SortedPairsByValue would have needed to be used.
+        Now changing this could break others shit if they didn't account for their loading order
+    ]]
+    for _, folder in ipairs(folders) do
         if folder ~= "." and folder ~= ".." then
-            for _, File in SortedPairs(file.Find(fol .. folder .. "/sh_*.lua", "LUA"), true) do
-                include(fol .. folder .. "/" .. File)
-            end
-
-            for _, File in SortedPairs(file.Find(fol .. folder .. "/cl_*.lua", "LUA"), true) do
-                include(fol .. folder .. "/" .. File)
+            for _, File in ipairs(file.Find(fol .. folder .. "/sh_*.lua", "LUA")) do
+                if File:StartsWith("sh_") or File:StartsWith("cl_") then
+                    include(fol .. folder .. "/" .. File)
+                end
             end
         end
     end

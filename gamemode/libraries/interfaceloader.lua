@@ -167,6 +167,20 @@ function finish()
 end
 
 --[[---------------------------------------------------------------------------
+Unlike Gmod's file.Exists, we check for the file itself to exist.
+file.Exists on the other hand also checks if a directory exists making it a bit slower.
+---------------------------------------------------------------------------]]
+function file.SimpleExists(fileName, gamePath)
+    local file = file.Open(fileName, "rb", gamePath)
+    if file then
+        file:Close()
+        return true
+    end
+
+    return false
+end
+
+--[[---------------------------------------------------------------------------
 Load the interface files
 ---------------------------------------------------------------------------]]
 local function loadInterfaces()
@@ -184,22 +198,22 @@ local function loadInterfaces()
         local shared = string.format(interfacefile, "sh")
         local server = string.format(interfacefile, "sv")
 
-        if file.Exists(shared, "LUA") then
+        if file.SimpleExists(shared, "LUA") then
             if SERVER then AddCSLuaFile(shared) end
             realm = "Shared"
             include(shared)
         end
 
-        if SERVER and file.Exists(client, "LUA") then
+        if SERVER and file.SimpleExists(client, "LUA") then
             AddCSLuaFile(client)
         end
 
-        if SERVER and file.Exists(server, "LUA") then
+        if SERVER and file.SimpleExists(server, "LUA") then
             realm = "Server"
             include(server)
         end
 
-        if CLIENT and file.Exists(client, "LUA") then
+        if CLIENT and file.SimpleExists(client, "LUA") then
             realm = "Client"
             include(client)
         end

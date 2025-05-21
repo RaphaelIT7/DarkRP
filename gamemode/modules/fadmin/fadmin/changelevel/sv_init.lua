@@ -85,7 +85,7 @@ hook.Add("PlayerInitialSpawn", "FAdmin_ChangelevelInfo", function(ply)
         -- Throw all uncategorized maps into Other
         mapCategory = mapCategory or "Other"
         -- Don't show CS:GO maps
-        if mapCategory == "Counter-Strike" and not file.Exists("maps/" .. name .. ".bsp", "cstrike") then
+        if mapCategory == "Counter-Strike" and not file.SimpleExists("maps/" .. name .. ".bsp", "cstrike") then
             continue
         end
 

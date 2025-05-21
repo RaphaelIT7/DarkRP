@@ -9,21 +9,29 @@ DEFINE_BASECLASS("gamemode_sandbox")
 GM.Sandbox = BaseClass
 
 
+--[[
+    Previously used SortedPairs but it never had any effect since file.Find returned sequential tables so SortedPairsByValue would have needed to be used.
+    Now changing this could break others shit if they didn't account for their loading order
+]]
 local function LoadModules()
     local root = GM.FolderName .. "/gamemode/modules/"
     local _, folders = file.Find(root .. "*", "LUA")
 
-    for _, folder in SortedPairs(folders, true) do
+    for _, folder in ipairs(folders) do
         if DarkRP.disabledDefaults["modules"][folder] then continue end
 
-        for _, File in SortedPairs(file.Find(root .. folder .. "/sh_*.lua", "LUA"), true) do
-            if File == "sh_interface.lua" then continue end
-            include(root .. folder .. "/" .. File)
-        end
+        for _, File in ipairs(file.Find(root .. folder .. "/*.lua", "LUA")) do
+            if File:StartsWith("sh_") then
+                if File == "sh_interface.lua" then continue end
+                include(root .. folder .. "/" .. File)
+                continue
+            end
 
-        for _, File in SortedPairs(file.Find(root .. folder .. "/cl_*.lua", "LUA"), true) do
-            if File == "cl_interface.lua" then continue end
-            include(root .. folder .. "/" .. File)
+            if File:StartsWith("cl_") then
+                if File == "cl_interface.lua" then continue end
+                include(root .. folder .. "/" .. File)
+                continue
+            end
         end
     end
 end

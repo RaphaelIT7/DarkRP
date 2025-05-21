@@ -35,7 +35,7 @@ DarkRP.disabledDefaults["workarounds"]      = {}
 -- The client cannot use simplerr.runLuaFile because of restrictions in GMod.
 local doInclude = CLIENT and include or fc{simplerr.wrapError, simplerr.wrapLog, simplerr.runFile}
 
-if file.Exists("darkrp_config/disabled_defaults.lua", "LUA") then
+if file.SimpleExists("darkrp_config/disabled_defaults.lua", "LUA") then
     if SERVER then AddCSLuaFile("darkrp_config/disabled_defaults.lua") end
     doInclude("darkrp_config/disabled_defaults.lua")
 end
@@ -49,12 +49,12 @@ local configFiles = {
 }
 
 for _, File in ipairs(configFiles) do
-    if not file.Exists(File, "LUA") then continue end
+    if not file.SimpleExists(File, "LUA") then continue end
 
     if SERVER then AddCSLuaFile(File) end
     doInclude(File)
 end
-if SERVER and file.Exists("darkrp_config/mysql.lua", "LUA") then doInclude("darkrp_config/mysql.lua") end
+if SERVER and file.SimpleExists("darkrp_config/mysql.lua", "LUA") then doInclude("darkrp_config/mysql.lua") end
 
 --[[---------------------------------------------------------------------------
 Modules
@@ -64,10 +64,14 @@ local function loadModules()
 
     local _, folders = file.Find(fol .. "*", "LUA")
 
-    for _, folder in SortedPairs(folders, true) do
+    --[[
+        Previously used SortedPairs but it never had any effect since file.Find returned sequential tables so SortedPairsByValue would have needed to be used.
+        Now changing this could break others shit if they didn't account for their loading order
+    ]]
+    for _, folder in ipairs(folders, true) do
         if folder == "." or folder == ".." or GAMEMODE.Config.DisabledCustomModules[folder] then continue end
         -- Sound but incomplete way of detecting the error of putting addons in the darkrpmod folder
-        if file.Exists(fol .. folder .. "/addon.txt", "LUA") or file.Exists(fol .. folder .. "/addon.json", "LUA") then
+        if file.SimpleExists(fol .. folder .. "/addon.txt", "LUA") or file.SimpleExists(fol .. folder .. "/addon.json", "LUA") then
             DarkRP.errorNoHalt("Addon detected in the darkrp_modules folder.", 2, {
                 "This addon is not supposed to be in the darkrp_modules folder.",
                 "It is supposed to be in garrysmod/addons/ instead.",
@@ -78,29 +82,32 @@ local function loadModules()
             continue
         end
 
-        for _, File in SortedPairs(file.Find(fol .. folder .. "/sh_*.lua", "LUA"), true) do
-            if SERVER then
-                AddCSLuaFile(fol .. folder .. "/" .. File)
+        for _, File in ipairs(file.Find(fol .. folder .. "/*.lua", "LUA")) do
+            if File:StartsWith("sh_") then
+                if SERVER then
+                    AddCSLuaFile(fol .. folder .. "/" .. File)
+                end
+
+                if File == "sh_interface.lua" then continue end
+                doInclude(fol .. folder .. "/" .. File)
+                continue
             end
 
-            if File == "sh_interface.lua" then continue end
-            doInclude(fol .. folder .. "/" .. File)
-        end
-
-        if SERVER then
-            for _, File in SortedPairs(file.Find(fol .. folder .. "/sv_*.lua", "LUA"), true) do
+            if SERVER and File:StartsWith("sv_") then
                 if File == "sv_interface.lua" then continue end
                 doInclude(fol .. folder .. "/" .. File)
+                continue
             end
-        end
 
-        for _, File in SortedPairs(file.Find(fol .. folder .. "/cl_*.lua", "LUA"), true) do
-            if File == "cl_interface.lua" then continue end
+            if File:StartsWith("cl_") then
+                if File == "cl_interface.lua" then continue end
 
-            if SERVER then
-                AddCSLuaFile(fol .. folder .. "/" .. File)
-            else
-                doInclude(fol .. folder .. "/" .. File)
+                if SERVER then
+                    AddCSLuaFile(fol .. folder .. "/" .. File)
+                else
+                    doInclude(fol .. folder .. "/" .. File)
+                end
+                continue
             end
         end
     end
@@ -131,7 +138,8 @@ local customFiles = {
 }
 local function loadCustomDarkRPItems()
     for _, File in ipairs(customFiles) do
-        if not file.Exists(File, "LUA") then continue end
+        if not file.SimpleExists(File, "LUA") then continue end
+
         if File == "darkrp_customthings/food.lua" and DarkRP.disabledDefaults["modules"]["hungermod"] then continue end
 
         if SERVER then AddCSLuaFile(File) end

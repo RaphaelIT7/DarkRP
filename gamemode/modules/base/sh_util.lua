@@ -339,7 +339,7 @@ function DarkRP.ValidatedPhysicsInit(ent, solidType, hint)
             return false
         end
 
-        if not file.Exists(mdl, "GAME") then
+        if not file.SimpleExists(mdl, "GAME") then
             DarkRP.errorNoHalt(string.format("%s has missing model \"%s\" and will be invisible and motionless", class, mdl), 2, {
                 "Is the model path correct?",
                 "Is the model from an addon that is not installed?",

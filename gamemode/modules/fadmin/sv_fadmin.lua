@@ -27,19 +27,28 @@ local function AddCSLuaFolder(fol)
     fol = string.lower(fol)
     local _, folders = file.Find(fol .. "*", "LUA")
 
-    for _, folder in SortedPairs(folders, true) do
+    --[[
+        Previously used SortedPairs but it never had any effect since file.Find returned sequential tables so SortedPairsByValue would have needed to be used.
+        Now changing this could break others shit if they didn't account for their loading order
+    ]]
+    for _, folder in ipairs(folders) do
         if folder ~= "." and folder ~= ".." then
-            for _, File in SortedPairs(file.Find(fol .. folder .. "/sh_*.lua", "LUA")) do
-                AddCSLuaFile(fol .. folder .. "/" .. File)
-                include(fol .. folder .. "/" .. File)
-            end
+            for _, File in ipairs(file.Find(fol .. folder .. "/sh_*.lua", "LUA")) do
+                if File:StartsWith("sh_") then
+                    AddCSLuaFile(fol .. folder .. "/" .. File)
+                    include(fol .. folder .. "/" .. File)
+                    continue
+                end
 
-            for _, File in SortedPairs(file.Find(fol .. folder .. "/sv_*.lua", "LUA"), true) do
-                include(fol .. folder .. "/" .. File)
-            end
+                if File:StartsWith("sv_") then
+                    include(fol .. folder .. "/" .. File)
+                    continue
+                end
 
-            for _, File in SortedPairs(file.Find(fol .. folder .. "/cl_*.lua", "LUA"), true) do
-                AddCSLuaFile(fol .. folder .. "/" .. File)
+                if File:StartsWith("cl_") then
+                    AddCSLuaFile(fol .. folder .. "/" .. File)
+                    continue
+                end
             end
         end
     end
