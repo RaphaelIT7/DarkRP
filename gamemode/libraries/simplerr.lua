@@ -495,8 +495,13 @@ end
 -- Do NOT use this on clientside files.
 -- Clientside files sent by the server cannot be read using file.Read unless you're the host of a listen server
 function runFile(path)
-    if not file.Exists(path, "LUA") then error(string.format("Could not run file '%s' (file not found)", path)) end
+    -- Servers can globally define NO_SIMPLERR to disable it when they simply don't want it.
+    if NO_SIMPLERR then include(path) return true end
+
     local contents = file.Read(path, "LUA")
+
+    -- "contents" can only be nil if the file doesn't exist, this replaces the previous file.Exists call
+    if not contents then error(string.format("Could not run file '%s' (file not found)", path)) end
 
     -- Files can make a comment containing #NoSimplerr# to disable simplerr (and thus enable autorefresh)
     if string.find(contents, "#NoSimplerr#") then include(path) return true end
