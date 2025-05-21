@@ -269,8 +269,9 @@ hook.Add("DarkRPDBInitialized", "FAdmin_Retrievebans", function()
         end
     end)
 
-    if file.Exists("FAdmin/Bans.txt", "DATA") then
-        local bans = util.KeyValuesToTable(file.Read("FAdmin/bans.txt", "DATA") or {})
+    local fadminBans = file.Read("FAdmin/Bans.txt", "DATA")
+    if fadminBans then
+        local bans = util.KeyValuesToTable(fadminBans) or {}
         for k, v in pairs(bans) do
             FAdmin.BANS[string.upper(k)] = v
         end

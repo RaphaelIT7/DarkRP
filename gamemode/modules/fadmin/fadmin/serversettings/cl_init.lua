@@ -13,7 +13,7 @@ local function SetLimits()
     local Form = vgui.Create("DForm", PanelList)
     Form:SetName("")
 
-    local Settings = util.KeyValuesToTable(file.Read("gamemodes/sandbox/sandbox.txt", "GAME")) -- All SBox limits are in here :D
+    local Settings = util.KeyValuesToTable(file.Read("gamemodes/sandbox/sandbox.txt", "MOD_WRITE")) -- All SBox limits are in here :D
     for _, v in SortedPairs(Settings.settings or {}) do
         if v.type == "Numeric" then
             local left, _ = Form:NumberWang(v.text, nil, v.low or 0, v.high or 1000, v.decimals or 0)
