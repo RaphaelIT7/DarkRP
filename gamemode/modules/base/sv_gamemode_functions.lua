@@ -541,8 +541,10 @@ function GM:PlayerDeath(ply, weapon, killer)
         -- If the player died in jail, make sure they can't respawn until their jail sentence is over
         -- NextSpawnTime is set to CurTime() on unarrest
         ply.NextSpawnTime = math.huge
-        DarkRP.printMessageAll(HUD_PRINTCENTER, DarkRP.getPhrase("died_in_jail", ply:Nick()))
-        DarkRP.notify(ply, 4, 4, DarkRP.getPhrase("dead_in_jail"))
+        if not GAMEMODE.Config.DisableDeathLog then
+            DarkRP.printMessageAll(HUD_PRINTCENTER, DarkRP.getPhrase("died_in_jail", ply:Nick()))
+            DarkRP.notify(ply, 4, 4, DarkRP.getPhrase("dead_in_jail"))
+        end
     else
         -- Normal death, respawning.
         ply.NextSpawnTime = CurTime() + math.Clamp(GAMEMODE.Config.respawntime, 0, 10)
@@ -570,6 +572,8 @@ function GM:PlayerDeath(ply, weapon, killer)
     end
 
     ply.ConfiscatedWeapons = nil
+
+    if GAMEMODE.Config.DisableDeathLog then return end
 
     local KillerName = (killer:IsPlayer() and killer:Nick()) or tostring(killer)
     local WeaponName = IsValid(weapon) and ((weapon:IsPlayer() and weapon:GetActiveWeapon():IsValid() and weapon:GetActiveWeapon():GetClass()) or weapon:GetClass()) or "unknown"
