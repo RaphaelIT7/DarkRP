@@ -171,6 +171,10 @@ Unlike Gmod's file.Exists, we check for the file itself to exist.
 file.Exists on the other hand also checks if a directory exists making it a bit slower.
 ---------------------------------------------------------------------------]]
 function file.SimpleExists(fileName, gamePath)
+    if CLIENT then
+        return file.Exists(fileName, gamePath) -- file.Open doesn't work for lua cache, so we need to fallback to file.Exists
+    end
+
     local file = file.Open(fileName, "rb", gamePath)
     if file then
         file:Close()
