@@ -310,8 +310,7 @@ local function addEntityCommands(tblEnt)
 
         DarkRP.placeEntity(ent, tr, ply)
 
-        local phys = ent:GetPhysicsObject()
-        if phys:IsValid() then phys:Wake() end
+        ent:PhysWake()
 
         return ent
     end
